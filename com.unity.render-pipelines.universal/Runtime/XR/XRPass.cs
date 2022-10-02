@@ -475,7 +475,7 @@ namespace UnityEngine.Rendering.Universal
         private Matrix4x4[] stereoPrevViewMatrix = new Matrix4x4[2];
         private Matrix4x4[] stereoCameraProjectionMatrix = new Matrix4x4[2];
 
-        internal void UpdateGPUViewAndProjectionMatrices(CommandBuffer cmd, ref CameraData cameraData, bool isRenderToTexture, bool isOculusMotionVec = false)
+        internal void UpdateGPUViewAndProjectionMatrices(CommandBuffer cmd, ref CameraData cameraData, bool isRenderToTexture, bool isOculusMotionVec = false, bool mirror = false)
         {
             Matrix4x4 projectionMatrix = GL.GetGPUProjectionMatrix(cameraData.xr.GetProjMatrix(0), isRenderToTexture);
             RenderingUtils.SetViewAndProjectionMatrices(cmd, cameraData.xr.GetViewMatrix(0), projectionMatrix, true);
@@ -486,9 +486,20 @@ namespace UnityEngine.Rendering.Universal
                 for (int i = 0; i < 2; i++)
                 {
                     stereoCameraProjectionMatrix[i] = cameraData.xr.GetProjMatrix(i);
+
                     stereoViewMatrix[i] = cameraData.xr.GetViewMatrix(i);
                     stereoPrevViewMatrix[i] = cameraData.xr.GetPrevViewMatrix(i);
                     stereoProjectionMatrix[i] = GL.GetGPUProjectionMatrix(stereoCameraProjectionMatrix[i], isRenderToTexture);
+                    if (mirror)
+                    {
+                        stereoProjectionMatrix[i].m00 = -stereoProjectionMatrix[i].m00;
+                        stereoCameraProjectionMatrix[i].m00 = -stereoCameraProjectionMatrix[i].m00;
+                        GL.invertCulling = true;
+                    }
+                    else
+                    {
+                        GL.invertCulling = false;
+                    }
                     prevViewValid = cameraData.xr.GetPrevViewValid(i);
                 }
                 RenderingUtils.SetStereoViewAndProjectionMatrices(cmd, stereoViewMatrix, stereoProjectionMatrix, stereoCameraProjectionMatrix, true, prevViewValid, stereoPrevViewMatrix, isOculusMotionVec);

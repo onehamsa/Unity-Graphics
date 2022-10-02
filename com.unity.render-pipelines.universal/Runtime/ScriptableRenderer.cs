@@ -23,6 +23,7 @@ namespace UnityEngine.Rendering.Universal
     /// </summary>
     public abstract partial class ScriptableRenderer : IDisposable
     {
+        public static bool mirror = false;
         private static partial class Profiling
         {
             private const string k_Name = nameof(ScriptableRenderer);
@@ -111,6 +112,16 @@ namespace UnityEngine.Rendering.Universal
 
             Matrix4x4 viewMatrix = cameraData.GetViewMatrix();
             Matrix4x4 projectionMatrix = cameraData.GetProjectionMatrix();
+
+            if (mirror)
+            {
+                projectionMatrix.m00 = -projectionMatrix.m00;
+                GL.invertCulling = true;
+            }
+            else
+            {
+                GL.invertCulling = false;
+            }
 
             // TODO: Investigate why SetViewAndProjectionMatrices is causing y-flip / winding order issue
             // for now using cmd.SetViewProjecionMatrices
@@ -1209,7 +1220,7 @@ namespace UnityEngine.Rendering.Universal
                             // Non-stereo buffer is already updated internally when switching render target. We update stereo buffers here to keep the consistency.
                             bool isRenderToBackBufferTarget = ((passColorAttachment == cameraData.xr.renderTarget) && !cameraData.xr.renderTargetIsRenderTexture) ||
                                 ((passColorAttachment == cameraData.xr.motionVectorRenderTarget) && !cameraData.xr.motionVectorRenderTargetIsRenderTexture);
-                            cameraData.xr.UpdateGPUViewAndProjectionMatrices(cmd, ref cameraData, !isRenderToBackBufferTarget, isOculusMotionVec);
+                            cameraData.xr.UpdateGPUViewAndProjectionMatrices(cmd, ref cameraData, !isRenderToBackBufferTarget, isOculusMotionVec, mirror);
                         }
 #endif
                     }
