@@ -502,11 +502,11 @@ namespace UnityEngine.Rendering.Universal
 
                     (stereoViewMatrix[0], stereoViewMatrix[1]) = (stereoViewMatrix[1], stereoViewMatrix[0]);
 
-                    GL.invertCulling = true;
+                    cmd.SetInvertCulling(true);
                 }
                 else
                 {
-                    GL.invertCulling = false;
+                    cmd.SetInvertCulling(false);
                 }
 
                 RenderingUtils.SetStereoViewAndProjectionMatrices(cmd, stereoViewMatrix, stereoProjectionMatrix, stereoCameraProjectionMatrix, true, prevViewValid, stereoPrevViewMatrix, isOculusMotionVec);

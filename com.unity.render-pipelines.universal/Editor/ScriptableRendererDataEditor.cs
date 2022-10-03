@@ -13,6 +13,11 @@ namespace UnityEditor.Rendering.Universal
     {
         class Styles
         {
+
+            public static readonly GUIContent Mirror =
+                new GUIContent("Mirror",
+                    "OneHamsa Feature: this creates a mirror on the x axis using the camera matrices");
+
             public static readonly GUIContent RenderFeatures =
                 new GUIContent("Renderer Features",
                     "A Renderer Feature is an asset that lets you add extra Render passes to a URP Renderer and configure their behavior.");
@@ -35,6 +40,7 @@ namespace UnityEditor.Rendering.Universal
         private SerializedProperty m_RendererFeatures;
         private SerializedProperty m_RendererFeaturesMap;
         private SerializedProperty m_FalseBool;
+        private SerializedProperty m_Mirror;
         [SerializeField] private bool falseBool = false;
         List<Editor> m_Editors = new List<Editor>();
 
@@ -42,6 +48,7 @@ namespace UnityEditor.Rendering.Universal
         {
             m_RendererFeatures = serializedObject.FindProperty(nameof(ScriptableRendererData.m_RendererFeatures));
             m_RendererFeaturesMap = serializedObject.FindProperty(nameof(ScriptableRendererData.m_RendererFeatureMap));
+            m_Mirror = serializedObject.FindProperty(nameof(ScriptableRendererData.m_Mirror));
             var editorObj = new SerializedObject(this);
             m_FalseBool = editorObj.FindProperty(nameof(falseBool));
             UpdateEditorList();
@@ -65,6 +72,15 @@ namespace UnityEditor.Rendering.Universal
 
         private void DrawRendererFeatureList()
         {
+
+            EditorGUILayout.LabelField(Styles.Mirror, EditorStyles.boldLabel);
+            EditorGUI.indentLevel++;
+            EditorGUI.BeginChangeCheck();
+            EditorGUILayout.PropertyField(m_Mirror, Styles.Mirror);
+            EditorGUI.EndChangeCheck();
+            serializedObject.ApplyModifiedProperties();
+            EditorGUI.indentLevel--;
+
             EditorGUILayout.LabelField(Styles.RenderFeatures, EditorStyles.boldLabel);
             EditorGUILayout.Space();
 

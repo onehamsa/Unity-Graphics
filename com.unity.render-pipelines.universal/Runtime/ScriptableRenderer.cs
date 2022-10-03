@@ -23,7 +23,7 @@ namespace UnityEngine.Rendering.Universal
     /// </summary>
     public abstract partial class ScriptableRenderer : IDisposable
     {
-        public static bool mirror = false;
+        internal bool mirror = false;
         private static partial class Profiling
         {
             private const string k_Name = nameof(ScriptableRenderer);
@@ -100,7 +100,7 @@ namespace UnityEngine.Rendering.Universal
         /// <param name="cmd">CommandBuffer to submit data to GPU.</param>
         /// <param name="cameraData">CameraData containing camera matrices information.</param>
         /// <param name="setInverseMatrices">Set this to true if you also need to set inverse camera matrices.</param>
-        public static void SetCameraMatrices(CommandBuffer cmd, ref CameraData cameraData, bool setInverseMatrices)
+        public static void SetCameraMatrices(CommandBuffer cmd, ref CameraData cameraData, bool setInverseMatrices, bool mirror)
         {
 #if ENABLE_VR && ENABLE_XR_MODULE
             if (cameraData.xr.enabled)
@@ -113,19 +113,20 @@ namespace UnityEngine.Rendering.Universal
             Matrix4x4 viewMatrix = cameraData.GetViewMatrix();
             Matrix4x4 projectionMatrix = cameraData.GetProjectionMatrix();
 
-            if (mirror)
+            if (mirror && cameraData.cameraType == CameraType.Game)
             {
                 projectionMatrix.m00 = -projectionMatrix.m00;
-                GL.invertCulling = true;
+                cmd.SetInvertCulling(true);
             }
             else
             {
-                GL.invertCulling = false;
+                cmd.SetInvertCulling(false);
             }
 
             // TODO: Investigate why SetViewAndProjectionMatrices is causing y-flip / winding order issue
             // for now using cmd.SetViewProjecionMatrices
             //SetViewAndProjectionMatrices(cmd, viewMatrix, cameraData.GetDeviceProjectionMatrix(), setInverseMatrices);
+
             cmd.SetViewProjectionMatrices(viewMatrix, projectionMatrix);
 
             if (setInverseMatrices)
@@ -239,7 +240,7 @@ namespace UnityEngine.Rendering.Universal
             cmd.SetGlobalVector(ShaderPropertyId.globalMipBias, new Vector2(mipBias, Mathf.Pow(2.0f, mipBias)));
 
             //Set per camera matrices.
-            SetCameraMatrices(cmd, ref cameraData, true);
+            SetCameraMatrices(cmd, ref cameraData, true, mirror);
         }
 
         /// <summary>
@@ -539,6 +540,8 @@ namespace UnityEngine.Rendering.Universal
                 m_StoreActionsOptimizationSetting = UniversalRenderPipeline.asset.storeActionsOptimization;
 
             m_UseOptimizedStoreActions = m_StoreActionsOptimizationSetting != StoreActionsOptimization.Store;
+
+            mirror = data.Mirror;
         }
 
         public void Dispose()
@@ -782,6 +785,7 @@ namespace UnityEngine.Rendering.Universal
                     m_ActiveRenderPassQueue[i].m_InputAttachmentIndices.Dispose();
                 }
             }
+            cmd.SetInvertCulling(false);
 
             context.ExecuteCommandBuffer(cmd);
             CommandBufferPool.Release(cmd);
