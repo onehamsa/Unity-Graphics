@@ -486,22 +486,29 @@ namespace UnityEngine.Rendering.Universal
                 for (int i = 0; i < 2; i++)
                 {
                     stereoCameraProjectionMatrix[i] = cameraData.xr.GetProjMatrix(i);
-
                     stereoViewMatrix[i] = cameraData.xr.GetViewMatrix(i);
                     stereoPrevViewMatrix[i] = cameraData.xr.GetPrevViewMatrix(i);
                     stereoProjectionMatrix[i] = GL.GetGPUProjectionMatrix(stereoCameraProjectionMatrix[i], isRenderToTexture);
-                    if (mirror)
-                    {
-                        stereoProjectionMatrix[i].m00 = -stereoProjectionMatrix[i].m00;
-                        stereoCameraProjectionMatrix[i].m00 = -stereoCameraProjectionMatrix[i].m00;
-                        GL.invertCulling = true;
-                    }
-                    else
-                    {
-                        GL.invertCulling = false;
-                    }
                     prevViewValid = cameraData.xr.GetPrevViewValid(i);
                 }
+
+                if (mirror)
+                {
+                    stereoProjectionMatrix[0].m00 = -stereoProjectionMatrix[0].m00;
+                    stereoCameraProjectionMatrix[0].m00 = -stereoCameraProjectionMatrix[0].m00;
+
+                    stereoProjectionMatrix[1].m00 = -stereoProjectionMatrix[1].m00;
+                    stereoCameraProjectionMatrix[1].m00 = -stereoCameraProjectionMatrix[1].m00;
+
+                    (stereoViewMatrix[0], stereoViewMatrix[1]) = (stereoViewMatrix[1], stereoViewMatrix[0]);
+
+                    GL.invertCulling = true;
+                }
+                else
+                {
+                    GL.invertCulling = false;
+                }
+
                 RenderingUtils.SetStereoViewAndProjectionMatrices(cmd, stereoViewMatrix, stereoProjectionMatrix, stereoCameraProjectionMatrix, true, prevViewValid, stereoPrevViewMatrix, isOculusMotionVec);
                 if (cameraData.xr.canMarkLateLatch)
                     MarkLateLatchShaderProperties(cmd, ref cameraData);
