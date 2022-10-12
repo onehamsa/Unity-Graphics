@@ -18,6 +18,10 @@ namespace UnityEditor.Rendering.Universal
                 new GUIContent("Mirror",
                     "OneHamsa Feature: this creates a mirror on the x axis using the camera matrices");
 
+            public static readonly GUIContent Hallucination =
+                new GUIContent("Hallucination",
+                    "OneHamsa Feature: messes with the camera projection matrix in a plesant way");
+
             public static readonly GUIContent RenderFeatures =
                 new GUIContent("Renderer Features",
                     "A Renderer Feature is an asset that lets you add extra Render passes to a URP Renderer and configure their behavior.");
@@ -41,6 +45,7 @@ namespace UnityEditor.Rendering.Universal
         private SerializedProperty m_RendererFeaturesMap;
         private SerializedProperty m_FalseBool;
         private SerializedProperty m_Mirror;
+        private SerializedProperty m_Hallucination;
         [SerializeField] private bool falseBool = false;
         List<Editor> m_Editors = new List<Editor>();
 
@@ -49,6 +54,7 @@ namespace UnityEditor.Rendering.Universal
             m_RendererFeatures = serializedObject.FindProperty(nameof(ScriptableRendererData.m_RendererFeatures));
             m_RendererFeaturesMap = serializedObject.FindProperty(nameof(ScriptableRendererData.m_RendererFeatureMap));
             m_Mirror = serializedObject.FindProperty(nameof(ScriptableRendererData.m_Mirror));
+            m_Hallucination = serializedObject.FindProperty(nameof(ScriptableRendererData.m_Hallucination));
             var editorObj = new SerializedObject(this);
             m_FalseBool = editorObj.FindProperty(nameof(falseBool));
             UpdateEditorList();
@@ -77,6 +83,14 @@ namespace UnityEditor.Rendering.Universal
             EditorGUI.indentLevel++;
             EditorGUI.BeginChangeCheck();
             EditorGUILayout.PropertyField(m_Mirror, Styles.Mirror);
+            EditorGUI.EndChangeCheck();
+            serializedObject.ApplyModifiedProperties();
+            EditorGUI.indentLevel--;
+
+            EditorGUILayout.LabelField(Styles.Hallucination, EditorStyles.boldLabel);
+            EditorGUI.indentLevel++;
+            EditorGUI.BeginChangeCheck();
+            EditorGUILayout.PropertyField(m_Hallucination, Styles.Hallucination);
             EditorGUI.EndChangeCheck();
             serializedObject.ApplyModifiedProperties();
             EditorGUI.indentLevel--;

@@ -45,6 +45,7 @@ namespace UnityEngine.Rendering.Universal
         [SerializeField] internal List<long> m_RendererFeatureMap = new List<long>(10);
         [SerializeField] bool m_UseNativeRenderPass = false;
         [SerializeField] internal bool m_Mirror;
+        [SerializeField] internal bool m_Hallucination;
 
         /// <summary>
         /// List of additional render pass features for this renderer.
@@ -100,6 +101,16 @@ namespace UnityEngine.Rendering.Universal
             {
                 SetDirty();
                 m_Mirror = value;
+            }
+        }
+
+        public bool Hallucination
+        {
+            get => m_Hallucination;
+            set
+            {
+                SetDirty();
+                m_Hallucination = value;
             }
         }
 

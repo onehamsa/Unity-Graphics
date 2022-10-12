@@ -24,6 +24,7 @@ namespace UnityEngine.Rendering.Universal
     public abstract partial class ScriptableRenderer : IDisposable
     {
         internal bool mirror = false;
+        internal bool hallucinate = false;
         private static partial class Profiling
         {
             private const string k_Name = nameof(ScriptableRenderer);
@@ -90,6 +91,18 @@ namespace UnityEngine.Rendering.Universal
         /// </summary>
         internal static ScriptableRenderer current = null;
 
+        public static void ApplyHallucinationMatrix(ref Matrix4x4 proj, float strength = 0.01f, float frequency = 2)
+        {
+            for (int j = 0; j < 3; j++)
+            {
+                var col = proj.GetColumn(j);
+                var offset = proj.GetColumn((j + 1) % 3);
+                offset *= strength * Mathf.Sin(j + frequency * Time.time);
+                col += offset;
+                proj.SetColumn(j, col.normalized);
+            }
+        }
+
         /// <summary>
         /// Set camera matrices. This method will set <c>UNITY_MATRIX_V</c>, <c>UNITY_MATRIX_P</c>, <c>UNITY_MATRIX_VP</c> to camera matrices.
         /// Additionally this will also set <c>unity_CameraProjection</c> and <c>unity_CameraProjection</c>.
@@ -100,7 +113,7 @@ namespace UnityEngine.Rendering.Universal
         /// <param name="cmd">CommandBuffer to submit data to GPU.</param>
         /// <param name="cameraData">CameraData containing camera matrices information.</param>
         /// <param name="setInverseMatrices">Set this to true if you also need to set inverse camera matrices.</param>
-        public static void SetCameraMatrices(CommandBuffer cmd, ref CameraData cameraData, bool setInverseMatrices, bool mirror)
+        public static void SetCameraMatrices(CommandBuffer cmd, ref CameraData cameraData, bool setInverseMatrices, bool mirror, bool hallucinate)
         {
 #if ENABLE_VR && ENABLE_XR_MODULE
             if (cameraData.xr.enabled)
@@ -121,6 +134,11 @@ namespace UnityEngine.Rendering.Universal
             else
             {
                 cmd.SetInvertCulling(false);
+            }
+
+            if (hallucinate && cameraData.cameraType == CameraType.Game)
+            {
+                ApplyHallucinationMatrix(ref projectionMatrix);
             }
 
             // TODO: Investigate why SetViewAndProjectionMatrices is causing y-flip / winding order issue
@@ -240,7 +258,7 @@ namespace UnityEngine.Rendering.Universal
             cmd.SetGlobalVector(ShaderPropertyId.globalMipBias, new Vector2(mipBias, Mathf.Pow(2.0f, mipBias)));
 
             //Set per camera matrices.
-            SetCameraMatrices(cmd, ref cameraData, true, mirror);
+            SetCameraMatrices(cmd, ref cameraData, true, mirror, hallucinate);
         }
 
         /// <summary>
@@ -542,6 +560,7 @@ namespace UnityEngine.Rendering.Universal
             m_UseOptimizedStoreActions = m_StoreActionsOptimizationSetting != StoreActionsOptimization.Store;
 
             mirror = data.Mirror;
+            hallucinate = data.Hallucination;
         }
 
         public void Dispose()
@@ -1224,7 +1243,7 @@ namespace UnityEngine.Rendering.Universal
                             // Non-stereo buffer is already updated internally when switching render target. We update stereo buffers here to keep the consistency.
                             bool isRenderToBackBufferTarget = ((passColorAttachment == cameraData.xr.renderTarget) && !cameraData.xr.renderTargetIsRenderTexture) ||
                                 ((passColorAttachment == cameraData.xr.motionVectorRenderTarget) && !cameraData.xr.motionVectorRenderTargetIsRenderTexture);
-                            cameraData.xr.UpdateGPUViewAndProjectionMatrices(cmd, ref cameraData, !isRenderToBackBufferTarget, isOculusMotionVec, mirror);
+                            cameraData.xr.UpdateGPUViewAndProjectionMatrices(cmd, ref cameraData, !isRenderToBackBufferTarget, isOculusMotionVec, mirror, hallucinate);
                         }
 #endif
                     }
