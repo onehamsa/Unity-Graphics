@@ -99,7 +99,7 @@ namespace UnityEngine.Rendering.Universal
                 var offset = proj.GetColumn((j + 1) % 3);
                 offset *= strength * Mathf.Sin(j + frequency * Time.time);
                 col += offset;
-                proj.SetColumn(j, col.normalized);
+                proj.SetColumn(j, col);
             }
         }
 
