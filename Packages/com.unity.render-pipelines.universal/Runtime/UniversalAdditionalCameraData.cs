@@ -811,8 +811,10 @@ namespace UnityEngine.Rendering.Universal
         /// <inheritdoc/>
         public void OnDestroy()
         {
+            #if !UNITY_EDITOR_LINUX
             scriptableRenderer?.ReleaseRenderTargets();
             m_Camera.DestroyVolumeStack(this);
+            #endif
         }
     }
 }
