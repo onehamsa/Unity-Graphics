@@ -70,6 +70,8 @@ namespace UnityEngine.Rendering
         {
 #if UNITY_SERVER
             return false;
+#elif UNITY_EDITOR_LINUX // added by One Hamsa
+            return false;
 #else
             return SystemInfo.graphicsDeviceType != GraphicsDeviceType.OpenGLES3 &&
                 SystemInfo.graphicsDeviceType != GraphicsDeviceType.OpenGLCore;
