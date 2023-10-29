@@ -953,9 +953,7 @@ namespace UnityEngine.Rendering.Universal.Internal
 
                 bool softShadows = renderingData.shadowData.supportsSoftShadows && (mainLightHasSoftShadows || additionalLightHasSoftShadows);
                 renderingData.shadowData.isKeywordSoftShadowsEnabled = softShadows;
-
-                CoreUtils.SetKeyword(cmd, ShaderKeywordStrings.AdditionalLightShadows, renderingData.shadowData.isKeywordAdditionalLightShadowsEnabled);
-                CoreUtils.SetKeyword(cmd, ShaderKeywordStrings.SoftShadows, renderingData.shadowData.isKeywordSoftShadowsEnabled);
+                ShadowUtils.SetSoftShadowQualityShaderKeywords(cmd, ref renderingData.shadowData);
 
                 if (anyShadowSliceRenderer)
                     SetupAdditionalLightsShadowReceiverConstants(cmd, softShadows);
