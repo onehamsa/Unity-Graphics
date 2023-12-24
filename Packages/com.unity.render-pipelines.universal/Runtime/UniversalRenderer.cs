@@ -123,9 +123,9 @@ namespace UnityEngine.Rendering.Universal
 
         internal RenderTargetBufferSystem m_ColorBufferSystem;
 
-        internal RTHandle m_ActiveCameraColorAttachment;
+        public static RTHandle m_ActiveCameraColorAttachment;
         RTHandle m_ColorFrontBuffer;
-        internal RTHandle m_ActiveCameraDepthAttachment;
+        public static RTHandle m_ActiveCameraDepthAttachment;
         internal RTHandle m_CameraDepthAttachment;
         RTHandle m_XRTargetHandleAlias;
         internal RTHandle m_DepthTexture;
@@ -628,6 +628,7 @@ namespace UnityEngine.Rendering.Universal
             useDepthPriming = IsDepthPrimingEnabled(ref cameraData);
             // This indicates whether the renderer will output a depth texture.
             bool requiresDepthTexture = cameraData.requiresDepthTexture || renderPassInputs.requiresDepthTexture || m_DepthPrimingMode == DepthPrimingMode.Forced;
+            requiresDepthTexture = false;
 
 #if UNITY_EDITOR
             bool isGizmosEnabled = UnityEditor.Handles.ShouldRenderGizmos();
@@ -705,6 +706,7 @@ namespace UnityEngine.Rendering.Universal
             createDepthTexture |= useDepthPriming;
             // Todo seems like with mrt depth is not taken from first target
             createDepthTexture |= (renderingLayerProvidesRenderObjectPass);
+            createColorTexture = false;
 
 #if ENABLE_VR && ENABLE_XR_MODULE
             // URP can't handle msaa/size mismatch between depth RT and color RT(for now we create intermediate textures to ensure they match)
@@ -747,8 +749,9 @@ namespace UnityEngine.Rendering.Universal
                 bool intermediateRenderTexture = (createColorTexture || createDepthTexture) && !sceneViewFilterEnabled;
 
                 // RTHandles do not support combining color and depth in the same texture so we create them separately
-                // Should be independent from filtered scene view
-                createDepthTexture |= createColorTexture;
+                createDepthTexture = intermediateRenderTexture;
+                createColorTexture = false;
+                intermediateRenderTexture = false;
 
                 RenderTargetIdentifier targetId = BuiltinRenderTextureType.CameraTarget;
 #if ENABLE_VR && ENABLE_XR_MODULE
@@ -770,6 +773,8 @@ namespace UnityEngine.Rendering.Universal
 
                 m_ActiveCameraColorAttachment = createColorTexture ? m_ColorBufferSystem.PeekBackBuffer() : m_XRTargetHandleAlias;
                 m_ActiveCameraDepthAttachment = createDepthTexture ? m_CameraDepthAttachment : m_XRTargetHandleAlias;
+
+                m_ActiveCameraColorAttachment = m_XRTargetHandleAlias;
             }
             else
             {
@@ -781,12 +786,14 @@ namespace UnityEngine.Rendering.Universal
                     m_ColorBufferSystem = baseRenderer.m_ColorBufferSystem;
                 }
                 m_ActiveCameraColorAttachment = m_ColorBufferSystem.PeekBackBuffer();
-                m_ActiveCameraDepthAttachment = baseRenderer.m_ActiveCameraDepthAttachment;
+                //m_ActiveCameraDepthAttachment = baseRenderer.m_ActiveCameraDepthAttachment;
+
+                m_ActiveCameraColorAttachment = m_XRTargetHandleAlias;
                 m_XRTargetHandleAlias = baseRenderer.m_XRTargetHandleAlias;
             }
 
-            if (rendererFeatures.Count != 0 && !isPreviewCamera)
-                ConfigureCameraColorTarget(m_ColorBufferSystem.PeekBackBuffer());
+            //if (rendererFeatures.Count != 0 && !isPreviewCamera)
+                //ConfigureCameraColorTarget(m_ColorBufferSystem.PeekBackBuffer());
 
             bool copyColorPass = renderingData.cameraData.requiresOpaqueTexture || renderPassInputs.requiresColorTexture;
             // Check the createColorTexture logic above: intermediate color texture is not available for preview cameras.
@@ -1261,6 +1268,7 @@ namespace UnityEngine.Rendering.Universal
                 }
 
 #if ENABLE_VR && ENABLE_XR_MODULE
+                /*
                 if (cameraData.xr.enabled)
                 {
                     // active depth is depth target, we don't need a blit pass to resolve
@@ -1273,6 +1281,7 @@ namespace UnityEngine.Rendering.Universal
                         EnqueuePass(m_XRCopyDepthPass);
                     }
                 }
+                */
 #endif
             }
             // stay in RT so we resume rendering on stack after post-processing
