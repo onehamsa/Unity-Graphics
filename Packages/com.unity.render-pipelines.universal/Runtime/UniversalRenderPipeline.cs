@@ -919,8 +919,11 @@ namespace UnityEngine.Rendering.Universal
                 baseCameraData.cameraTargetDescriptor.graphicsFormat = originalTargetDesc.graphicsFormat;
             }
             baseCameraData.cameraTargetDescriptor.msaaSamples = originalTargetDesc.msaaSamples;
-            baseCameraData.cameraTargetDescriptor.width = baseCameraData.pixelWidth;
-            baseCameraData.cameraTargetDescriptor.height = baseCameraData.pixelHeight;
+            //baseCameraData.cameraTargetDescriptor.width = baseCameraData.pixelWidth;
+            //baseCameraData.cameraTargetDescriptor.height = baseCameraData.pixelHeight;
+            baseCameraData.cameraTargetDescriptor.width = xr.renderTargetDesc.width;
+            baseCameraData.cameraTargetDescriptor.height = xr.renderTargetDesc.height;
+            baseCameraData.cameraTargetDescriptor.useDynamicScale = true;
         }
 
         static void UpdateVolumeFramework(Camera camera, UniversalAdditionalCameraData additionalCameraData)

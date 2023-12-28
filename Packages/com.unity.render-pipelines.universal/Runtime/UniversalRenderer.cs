@@ -1553,7 +1553,7 @@ namespace UnityEngine.Rendering.Universal
             }
 #endif
             bool postProcessEnabled = cameraData.postProcessEnabled && m_PostProcessPasses.isCreated;
-            bool requiresBlitForOffscreenCamera = postProcessEnabled || cameraData.requiresOpaqueTexture || requiresExplicitMsaaResolve || !cameraData.isDefaultViewport;
+            bool requiresBlitForOffscreenCamera = postProcessEnabled || cameraData.requiresOpaqueTexture || requiresExplicitMsaaResolve; //|| !cameraData.isDefaultViewport;
             if (isOffscreenRender)
                 return requiresBlitForOffscreenCamera;
 
