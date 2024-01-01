@@ -13,6 +13,7 @@ namespace UnityEngine.Rendering.Universal.Internal
     {
         FilteringSettings m_FilteringSettings;
         ProfilingSampler m_ProfilingSampler;
+        List<ShaderTagId> m_ShaderTagIdList = new List<ShaderTagId>();
 
         RenderTargetIdentifier motionVectorColorIdentifier;
         RenderTargetIdentifier motionVectorDepthIdentifier;
@@ -23,6 +24,8 @@ namespace UnityEngine.Rendering.Universal.Internal
             m_ProfilingSampler = new ProfilingSampler(profilerTag);
             renderPassEvent = evt;
             m_FilteringSettings = new FilteringSettings(renderQueueRange, layerMask);
+            m_ShaderTagIdList.Add(new ShaderTagId("OculusMotionVectors"));
+            m_ShaderTagIdList.Add(new ShaderTagId("MotionVectors"));
         }
 
         internal OculusMotionVectorPass(URPProfileId profileId, bool opaque, RenderPassEvent evt, RenderQueueRange renderQueueRange, LayerMask layerMask, StencilState stencilState, int stencilReference)
@@ -50,6 +53,7 @@ namespace UnityEngine.Rendering.Universal.Internal
         {
             // NOTE: Do NOT mix ProfilingScope with named CommandBuffers i.e. CommandBufferPool.Get("name").
             // Currently there's an issue which results in mismatched markers.
+
             CommandBuffer cmd = CommandBufferPool.Get();
             using (new ProfilingScope(cmd, m_ProfilingSampler))
             {
@@ -59,7 +63,7 @@ namespace UnityEngine.Rendering.Universal.Internal
                 Camera camera = renderingData.cameraData.camera;
                 var filterSettings = m_FilteringSettings;
 
-                var drawSettings = CreateDrawingSettings(new ShaderTagId("MotionVectors"), ref renderingData, renderingData.cameraData.defaultOpaqueSortFlags);
+                var drawSettings = CreateDrawingSettings(m_ShaderTagIdList, ref renderingData, renderingData.cameraData.defaultOpaqueSortFlags);
                 drawSettings.perObjectData = PerObjectData.MotionVectors;
                 context.DrawRenderers(renderingData.cullResults, ref drawSettings, ref filterSettings);
             }
