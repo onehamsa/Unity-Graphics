@@ -966,6 +966,7 @@ namespace UnityEngine.Rendering.Universal
                 EnqueuePass(m_XROcclusionMeshPass);
 #endif
 
+#if !UNITY_EDITOR
             if (cameraData.xr.motionVectorRenderTargetValid)
             {
                 RenderTargetHandle motionVecHandle = new RenderTargetHandle(cameraData.xr.motionVectorRenderTarget);
@@ -976,6 +977,7 @@ namespace UnityEngine.Rendering.Universal
                 m_OculusMotionVecPass.Setup(rtMotionId, rtMotionId);
                 EnqueuePass(m_OculusMotionVecPass);
             }
+#endif
 
             bool lastCameraInTheStack = cameraData.resolveFinalTarget;
 
