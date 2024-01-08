@@ -24,8 +24,8 @@ namespace UnityEngine.Rendering.Universal.Internal
             m_ProfilingSampler = new ProfilingSampler(profilerTag);
             renderPassEvent = evt;
             m_FilteringSettings = new FilteringSettings(renderQueueRange, layerMask);
+            //m_ShaderTagIdList.Add(new ShaderTagId("MotionVectors"));
             m_ShaderTagIdList.Add(new ShaderTagId("OculusMotionVectors"));
-            m_ShaderTagIdList.Add(new ShaderTagId("MotionVectors"));
         }
 
         internal OculusMotionVectorPass(URPProfileId profileId, bool opaque, RenderPassEvent evt, RenderQueueRange renderQueueRange, LayerMask layerMask, StencilState stencilState, int stencilReference)

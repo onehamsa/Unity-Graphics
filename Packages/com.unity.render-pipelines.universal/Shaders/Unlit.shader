@@ -205,7 +205,7 @@ Shader "Universal Render Pipeline/Unlit"
         Pass
         {
             Name "MotionVectors"
-            Tags{ "LightMode" = "MotionVectors"}
+            Tags{ "LightMode" = "OculusMotionVectors"}
             Tags { "RenderType" = "Opaque" }
 
             ZWrite[_ZWrite]
