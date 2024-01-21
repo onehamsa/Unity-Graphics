@@ -191,8 +191,10 @@ namespace UnityEngine.Rendering.Universal.Internal
                 // TODO RENDERGRAPH: do this as a separate pass, so no need of calling OnExecute here...
                 data.pass.OnExecute(cmd);
 
+                #if UNITY_ANDROID
                 Rect rect = new Rect() {x=0,y=0, width=renderingData.cameraData.pixelWidth, height=renderingData.cameraData.pixelHeight };
                 cmd.SetViewport(rect);
+                #endif
 
                 context.ExecuteCommandBuffer(cmd);
                 cmd.Clear();

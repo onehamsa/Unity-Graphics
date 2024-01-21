@@ -912,11 +912,16 @@ namespace UnityEngine.Rendering.Universal
                 baseCameraData.cameraTargetDescriptor.graphicsFormat = originalTargetDesc.graphicsFormat;
             }
             baseCameraData.cameraTargetDescriptor.msaaSamples = originalTargetDesc.msaaSamples;
-            //baseCameraData.cameraTargetDescriptor.width = baseCameraData.pixelWidth;
-            //baseCameraData.cameraTargetDescriptor.height = baseCameraData.pixelHeight;
+            
+            #if UNITY_ANDROID
+            // To support oculus dynamic resolution ...
             baseCameraData.cameraTargetDescriptor.width = xr.renderTargetDesc.width;
             baseCameraData.cameraTargetDescriptor.height = xr.renderTargetDesc.height;
             baseCameraData.cameraTargetDescriptor.useDynamicScale = true;
+            #else
+            baseCameraData.cameraTargetDescriptor.width = baseCameraData.pixelWidth;
+            baseCameraData.cameraTargetDescriptor.height = baseCameraData.pixelHeight;
+            #endif
         }
 
         static void UpdateVolumeFramework(Camera camera, UniversalAdditionalCameraData additionalCameraData)
