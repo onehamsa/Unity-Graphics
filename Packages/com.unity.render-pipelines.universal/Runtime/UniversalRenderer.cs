@@ -1553,7 +1553,13 @@ namespace UnityEngine.Rendering.Universal
             }
 #endif
             bool postProcessEnabled = cameraData.postProcessEnabled && m_PostProcessPasses.isCreated;
-            bool requiresBlitForOffscreenCamera = postProcessEnabled || cameraData.requiresOpaqueTexture || requiresExplicitMsaaResolve; //|| !cameraData.isDefaultViewport;
+            #if UNITY_ANDROID
+            bool requiresBlitForOffscreenCamera = postProcessEnabled || cameraData.requiresOpaqueTexture ||
+                                                  requiresExplicitMsaaResolve;// || !cameraData.isDefaultViewport;
+            #else
+            bool requiresBlitForOffscreenCamera = postProcessEnabled || cameraData.requiresOpaqueTexture || requiresExplicitMsaaResolve || !cameraData.isDefaultViewport;
+            #endif
+            
             if (isOffscreenRender)
                 return requiresBlitForOffscreenCamera;
 
