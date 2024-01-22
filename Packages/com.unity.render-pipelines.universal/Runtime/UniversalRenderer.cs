@@ -706,7 +706,9 @@ namespace UnityEngine.Rendering.Universal
             createDepthTexture |= useDepthPriming;
             // Todo seems like with mrt depth is not taken from first target
             createDepthTexture |= (renderingLayerProvidesRenderObjectPass);
+            #if UNITY_ANDROID
             createColorTexture = false;
+            #endif
 
 #if ENABLE_VR && ENABLE_XR_MODULE
             // URP can't handle msaa/size mismatch between depth RT and color RT(for now we create intermediate textures to ensure they match)
@@ -750,8 +752,10 @@ namespace UnityEngine.Rendering.Universal
 
                 // RTHandles do not support combining color and depth in the same texture so we create them separately
                 createDepthTexture = intermediateRenderTexture;
+                #if UNITY_ANDROID
                 createColorTexture = false;
                 intermediateRenderTexture = false;
+                #endif
 
                 RenderTargetIdentifier targetId = BuiltinRenderTextureType.CameraTarget;
 #if ENABLE_VR && ENABLE_XR_MODULE
@@ -774,7 +778,9 @@ namespace UnityEngine.Rendering.Universal
                 m_ActiveCameraColorAttachment = createColorTexture ? m_ColorBufferSystem.PeekBackBuffer() : m_XRTargetHandleAlias;
                 m_ActiveCameraDepthAttachment = createDepthTexture ? m_CameraDepthAttachment : m_XRTargetHandleAlias;
 
+                #if UNITY_ANDROID
                 m_ActiveCameraColorAttachment = m_XRTargetHandleAlias;
+                #endif
             }
             else
             {
