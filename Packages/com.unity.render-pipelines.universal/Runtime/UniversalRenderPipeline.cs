@@ -941,7 +941,18 @@ namespace UnityEngine.Rendering.Universal
                 baseCameraData.cameraTargetDescriptor.graphicsFormat = originalTargetDesc.graphicsFormat;
             }
             baseCameraData.cameraTargetDescriptor.msaaSamples = originalTargetDesc.msaaSamples;
-
+            
+            #if UNITY_ANDROID
+            // To support oculus dynamic resolution ...
+            baseCameraData.cameraTargetDescriptor.width = xr.renderTargetDesc.width;
+            baseCameraData.cameraTargetDescriptor.height = xr.renderTargetDesc.height;
+            baseCameraData.cameraTargetDescriptor.useDynamicScale = true;
+            #else
+            baseCameraData.cameraTargetDescriptor.width = baseCameraData.pixelWidth;
+            baseCameraData.cameraTargetDescriptor.height = baseCameraData.pixelHeight;
+            #endif
+			
+			/* ORIGINAL
             if (baseCameraData.isDefaultViewport)
             {
                 // When viewport is default, intermediate textures created with this descriptor will have dynamic resolution enabled.
@@ -954,6 +965,7 @@ namespace UnityEngine.Rendering.Universal
                 baseCameraData.cameraTargetDescriptor.height = baseCameraData.pixelHeight;
 				baseCameraData.cameraTargetDescriptor.useDynamicScale = false;
             }
+            */
         }
 
         static void UpdateVolumeFramework(Camera camera, UniversalAdditionalCameraData additionalCameraData)
