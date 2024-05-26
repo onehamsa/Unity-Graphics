@@ -338,8 +338,8 @@ namespace UnityEngine.Rendering.Universal
         internal bool useScreenCoordOverride;
         internal Vector4 screenSizeOverride;
         internal Vector4 screenCoordScaleBias;
-        internal int pixelWidth;
-        internal int pixelHeight;
+        public int pixelWidth;
+        public int pixelHeight;
         internal float aspectRatio;
 
         /// <summary>
