@@ -332,8 +332,8 @@ namespace UnityEngine.Rendering.Universal
         internal bool useScreenCoordOverride;
         internal Vector4 screenSizeOverride;
         internal Vector4 screenCoordScaleBias;
-        internal int pixelWidth;
-        internal int pixelHeight;
+        public int pixelWidth;
+        public int pixelHeight;
         internal float aspectRatio;
 
         /// <summary>
@@ -367,7 +367,7 @@ namespace UnityEngine.Rendering.Universal
         /// True if this camera should render to high dynamic range color targets.
         /// </summary>
         public bool isHdrEnabled;
-        
+
         /// <summary>
         /// True if this camera allow color conversion and encoding for high dynamic range displays.
         /// </summary>
