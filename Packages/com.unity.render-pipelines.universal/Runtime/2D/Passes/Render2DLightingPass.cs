@@ -189,13 +189,14 @@ namespace UnityEngine.Rendering.Universal
             ref DrawingSettings drawSettings,
             ref RenderTextureDescriptor desc)
         {
+            Debug.LogError("ONEHAMSA: FIXME - this draw call should not be called used in UNDERDOGS! and if it does. look at updating this URP fork to the latest version of URP");
+
             var debugHandler = GetActiveDebugHandler(ref renderingData);
             bool drawLights = debugHandler?.IsLightingActive ?? true;
             var batchesDrawn = 0;
             var rtCount = 0U;
 
             // Account for Sprite Mask and normal map usage where the first and last layer has to render the stencil pass
-            bool hasSpriteMask = UnityEngine.SpriteMaskUtility.HasSpriteMaskInScene();
             bool normalsFirstClear = true;
 
             // Draw lights
@@ -220,9 +221,7 @@ namespace UnityEngine.Rendering.Universal
 
                     batchesDrawn++;
 
-                    if (layerBatch.lightStats.totalNormalMapUsage > 0 ||
-                        (hasSpriteMask && i == 0) ||
-                        (hasSpriteMask && i + 1 == batchCount))
+                    if (layerBatch.lightStats.totalNormalMapUsage > 0)
                     {
                         filterSettings.sortingLayerRange = layerBatch.layerRange;
                         var depthTarget = m_NeedsDepth ? depthAttachmentHandle.nameID : BuiltinRenderTextureType.None;
