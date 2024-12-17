@@ -195,8 +195,7 @@ namespace UnityEngine.Rendering.Universal
             var rtCount = 0U;
 
             // Account for Sprite Mask and normal map usage where the first and last layer has to render the stencil pass
-            Debug.LogError("FIX ME - SpriteMaskUtility.HasSpriteMaskInLayer was deprecated"); // # one-hamsa change see for possible https://github.com/Oculus-VR/Unity-Graphics/commit/af8114de8a69fc7d00895476e82ddcb1bf5bada8
-            bool hasSpriteMask     = UnityEngine.SpriteMaskUtility.HasSpriteMaskInLayerRange(new SortingLayerRange()); // #one-hamsa change
+            bool hasSpriteMask = UnityEngine.SpriteMaskUtility.HasSpriteMaskInScene();
             bool normalsFirstClear = true;
 
             // Draw lights
